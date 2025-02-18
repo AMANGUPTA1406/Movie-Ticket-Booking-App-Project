@@ -147,7 +147,6 @@ exports.getUserBookings = async (req, res) => {
 
 
 
-
 // Controller for getting available seats for a showtime
 exports.getAvailableSeats = async (req, res) => {
   const { showId } = req.body;
@@ -166,21 +165,29 @@ exports.getAvailableSeats = async (req, res) => {
       return res.status(404).json({ error: 'Showtime not found' });
     }
 
-    // Find the specific screen and showtime
     let availableSeats = [];
-    let totalSeats = 0; // To count total seats
+    let totalSeats = 0;
 
+    // Iterate through screens to find the correct showtime
     theater.screens.forEach(screen => {
       screen.showtimes.forEach(showtime => {
         if (showtime._id.toString() === showId) {
-          const allSeats = showtime.seatCategories.flatMap(category => category.seats);
           const bookedSeats = showtime.booked || [];
           
-          // Total seats count
-          totalSeats = allSeats.length;
+          // Process each seat category
+          showtime.seatCategories.forEach(category => {
+            const { price, seats } = category;
 
-          // Filter out booked seats to get available ones
-          availableSeats = allSeats.filter(seat => !bookedSeats.includes(seat));
+            // Total seats count
+            totalSeats += seats.length;
+
+            // Filter out booked seats and include seat price
+            seats.forEach(seat => {
+              if (!bookedSeats.includes(seat)) {
+                availableSeats.push({ seat, price });
+              }
+            });
+          });
         }
       });
     });

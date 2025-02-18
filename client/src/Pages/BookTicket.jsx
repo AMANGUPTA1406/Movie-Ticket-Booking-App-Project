@@ -14,7 +14,7 @@ const BookTicketPage = () => {
   const [selectedMovie, setSelectedMovie] = useState('');
   const [screensAndShowtimes, setScreensAndShowtimes] = useState([]);
   const [selectedShowtime, setSelectedShowtime] = useState('');
-  const [availableSeats, setAvailableSeats] = useState([]);
+  const [availableSeats, setAvailableSeats] = useState([]); 
   const [totalSeats, setTotalSeats] = useState(0);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [showPurchaseSlip, setShowPurchaseSlip] = useState(false);
@@ -54,12 +54,9 @@ const BookTicketPage = () => {
 // Updated handleShowtimeChange
 const handleShowtimeChange = (showId) => {
   setSelectedShowtime(showId);
-
-  // Find and store the selected showtime details
   const showtimeDetails = screensAndShowtimes
     .flatMap((screen) => screen.showtimes)
     .find((showtime) => showtime.showId === showId);
-
   setSelectedShowtimeDetails(showtimeDetails);
 
   axios.post('/api/bookings/availableSeats', { showId }).then((response) => {
@@ -174,47 +171,70 @@ const handleShowtimeChange = (showId) => {
 
         {/* Step 5: Display All Seats */}
         {availableSeats.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Select Seats:</h2>
-            <div className="grid grid-cols-10 gap-2">
-              {Array.from({ length: totalSeats }, (_, index) => index + 1).map((seat) => (
-                <div
-                  key={seat}
-                  className={`p-3 border rounded-md ${
-                    selectedSeats.includes(seat)
-                      ? 'bg-green-500'
-                      : availableSeats.includes(seat)
-                      ? 'bg-gray-200'
-                      : 'bg-red-500'
-                  } cursor-pointer`}
-                  onClick={() => availableSeats.includes(seat) && toggleSeatSelection(seat)}
-                >
-                  {seat}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+    <div className="mb-6">
+      <h2 className="text-2xl font-semibold text-gray-700 mb-4">Select Seats:</h2>
+      <div className="grid grid-cols-10 gap-2">
+        {Array.from({ length: totalSeats }, (_, index) => {
+          const seatNumber = index + 1;
+          const seatInfo = availableSeats.find(s => s.seat === seatNumber);
+          const isAvailable = !!seatInfo;
+          const isSelected = selectedSeats.includes(seatNumber);
 
-{showPurchaseSlip && (
-  <div className="p-4 bg-gray-100 rounded-md shadow-md mb-6">
-    <h2 className="text-xl font-semibold mb-4">Purchase Slip</h2>
-    <p><strong>Location:</strong> {selectedLocation}</p>
-    <p><strong>Theater:</strong> {theaters.find((t) => t._id === selectedTheater)?.name}</p>
-    <p>
-      <strong>Showtime:</strong> {selectedShowtimeDetails ? 
-      `${new Date(selectedShowtimeDetails.time).toLocaleString()}` : ''}
-    </p>
-    <p><strong>Seats:</strong> {selectedSeats.join(', ')}</p>
-    <p><strong>Total Amount:</strong> ₹{selectedSeats.length * ticketPrice}</p>
-    <button
-      onClick={handleBookTicket}
-      className="bg-green-500 text-white py-2 px-4 rounded-md mt-4"
-    >
-      Pay and Book
-    </button>
-  </div>
-)}
+          return (
+            <div
+              key={seatNumber}
+              className={`p-3 border rounded-md text-center ${
+                isSelected
+                  ? 'bg-green-500 text-white'
+                  : isAvailable
+                  ? 'bg-gray-200 hover:bg-gray-300'
+                  : 'bg-red-500 cursor-not-allowed'
+              } ${isAvailable ? 'cursor-pointer' : ''}`
+              }
+              onClick={() => isAvailable && toggleSeatSelection(seatNumber)}
+            >
+              <div className="font-medium">{seatNumber}</div>
+              {isAvailable && (
+                <div className="text-xs mt-1">₹{seatInfo.price}</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
+
+{/* // Updated purchase slip */}
+  {showPurchaseSlip && (
+    <div className="p-4 bg-gray-100 rounded-md shadow-md mb-6">
+      <h2 className="text-xl font-semibold mb-4">Purchase Slip</h2>
+      <p><strong>Location:</strong> {selectedLocation}</p>
+      <p><strong>Theater:</strong> {theaters.find((t) => t._id === selectedTheater)?.name}</p>
+      <p>
+        <strong>Showtime:</strong> {selectedShowtimeDetails ? 
+        `${new Date(selectedShowtimeDetails.time).toLocaleString()}` : ''}
+      </p>
+      <p>
+        <strong>Seats:</strong> {selectedSeats.map(seat => {
+          const seatInfo = availableSeats.find(s => s.seat === seat);
+          return `${seat} (₹${seatInfo?.price || 'N/A'})`;
+        }).join(', ')}
+      </p>
+      <p>
+        <strong>Total Amount:</strong> ₹{selectedSeats.reduce((total, seat) => {
+          const seatInfo = availableSeats.find(s => s.seat === seat);
+          return total + (seatInfo?.price || 0);
+        }, 0)}
+      </p>
+      <button
+        onClick={handleBookTicket}
+        className="bg-green-500 text-white py-2 px-4 rounded-md mt-4"
+      >
+        Pay and Book
+      </button>
+    </div>
+  )}
 
 
         {/* Step 7: Proceed to Purchase Button */}

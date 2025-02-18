@@ -15,7 +15,7 @@ const AdminTheater = () => {
   useEffect(() => {
     const fetchTheaters = async () => {
       try {
-        const response = await axios.get('/api/theaters/getall');
+        const response = await axios.post('/api/theaters/getall');
         setTheaters(response.data);
       } catch (error) {
         console.error('Error fetching theaters:', error);
@@ -50,7 +50,7 @@ const AdminTheater = () => {
       }
       setFormData({ name: '', location: '', screens: [] }); // Clear the form
       // Refresh theater list after submit
-      const response = await axios.get('/api/theaters/getall');
+      const response = await axios.post('/api/theaters/getall');
       setTheaters(response.data);
     } catch (error) {
       console.error('Error submitting form:', error);

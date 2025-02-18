@@ -17,10 +17,10 @@ router.post("/addScreen", isAuthenticated, isAdmin, addScreen);
 router.post("/addShowtime", isAuthenticated, isAdmin, addShowtime);
 
 // Get all theaters 
-router.get("/getall", getTheaters);
+router.post("/getall", getTheaters);
 
 // Get a theater by ID  
-router.get("/theaters/:id", getTheaterById);
+router.post("/theaters/:id", getTheaterById);
 
 // Search theaters by location
 router.post("/search/TheaterBylocation", searchByLocation);
