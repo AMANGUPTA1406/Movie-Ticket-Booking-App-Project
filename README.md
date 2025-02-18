@@ -17,7 +17,6 @@ Follow the steps below to install all the dependencies for both the server (back
     ```bash
     npm install
 3. Install other dependencies if needed:
-    npm install <dependency-name>
 
 ### Client (Frontend)
 1. Navigate to the client directory:
@@ -28,7 +27,6 @@ Follow the steps below to install all the dependencies for both the server (back
     ```bash
     npm install
 3. Install other dependencies if needed:
-    npm install <dependency-name>
 
 Now you are ready to run the MovieTicketBookingApp!
 
