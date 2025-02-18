@@ -50,7 +50,7 @@ Here are some screenshots of the MovieTicketBookingApp to give you a glimpse of 
 ![Ticket Booking](ticketBook.png)
 
 ### User - Login
-[Login](login1.png)
+![Login](login1.png)
 
 ### User - Register
 ![Register User](register.png)
